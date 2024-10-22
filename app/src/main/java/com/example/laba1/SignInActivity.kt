@@ -2,39 +2,84 @@ package com.example.laba1
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class SignInActivity : AppCompatActivity(), View.OnClickListener {
-    lateinit var authButton: Button
-    lateinit var editEmail: EditText
-    lateinit var editPassword: EditText
-    lateinit var textError: TextView
+    private lateinit var authButton: Button
+    private lateinit var signUpButton: Button
+    private lateinit var editEmail: EditText
+    private lateinit var editPassword: EditText
+    private lateinit var textError: TextView
+    private lateinit var textUsername: TextView
+    private val TAG = "SignInActivity"
+
+    private val signUpLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let { intent ->
+                // Handle String data
+                val username = intent.getStringExtra("USERNAME") ?: ""
+                val email = intent.getStringExtra("EMAIL") ?: ""
+
+                // Handle Parcelable User object
+                val user = intent.getParcelableExtra<User>("USER")
+
+                // Display received data
+                textUsername.text = "Welcome, ${user?.username ?: username}"
+                editEmail.setText(user?.email ?: email)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        Log.d(TAG, "onCreate called")
         setContentView(R.layout.activity_sign_in)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
         authButton = findViewById(R.id.authButton)
+        signUpButton = findViewById(R.id.signUpButton)
         editEmail = findViewById(R.id.editEmailAddress)
         editPassword = findViewById(R.id.editPassword)
         textError = findViewById(R.id.textError)
+        textUsername = findViewById(R.id.textUsername)
 
         authButton.setOnClickListener(this)
+        signUpButton.setOnClickListener {
+            val intent = Intent(this, SignUpActivity::class.java)
+            signUpLauncher.launch(intent)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy called")
     }
 
     override fun onClick(view: View?) {

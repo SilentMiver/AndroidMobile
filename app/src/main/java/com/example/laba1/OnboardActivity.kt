@@ -2,31 +2,51 @@ package com.example.laba1
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
-class OnboardActivity : AppCompatActivity(), OnClickListener {
-    lateinit var button : Button
+class OnboardActivity : AppCompatActivity(), View.OnClickListener {
+    private lateinit var button: Button
+    private val TAG = "OnboardActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        Log.d(TAG, "onCreate called")
         setContentView(R.layout.activity_onboard)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+
         button = findViewById(R.id.labelButton)
         button.setOnClickListener(this)
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy called")
+    }
+
     override fun onClick(view: View?) {
-        var intent = Intent(this, SignInActivity::class.java)
+        val intent = Intent(this, SignInActivity::class.java)
         startActivity(intent)
     }
 }
