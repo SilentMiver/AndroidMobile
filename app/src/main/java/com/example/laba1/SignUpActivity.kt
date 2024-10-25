@@ -30,11 +30,11 @@ class SignUpActivity : AppCompatActivity() {
             val password = editPassword.text.toString()
 
             val resultIntent = Intent().apply {
-                // Method 1: Passing data as Strings
+
                 putExtra("USERNAME", username)
                 putExtra("EMAIL", email)
 
-                // Method 2: Passing data as User object
+
                 putExtra("USER", User(username, email, password))
             }
 
