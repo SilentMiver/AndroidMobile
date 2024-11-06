@@ -1,49 +1,49 @@
 package com.example.laba1
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.example.laba1.databinding.FragmentSignUpBinding
 
 class SignUpFragment : Fragment() {
-    private lateinit var editUsername: EditText
-    private lateinit var editEmail: EditText
-    private lateinit var editPassword: EditText
-    private lateinit var registerButton: Button
-    private val TAG = "SignUpFragment"
+    private var _binding: FragmentSignUpBinding? = null
+    private val binding get() = _binding!!
+    private val args: SignUpFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        Log.d(TAG, "onCreateView called")
-        return inflater.inflate(R.layout.fragment_sign_up, container, false)
+    ): View {
+        _binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        editUsername = view.findViewById(R.id.editUsername)
-        editEmail = view.findViewById(R.id.editEmailAddress)
-        editPassword = view.findViewById(R.id.editPassword)
-        registerButton = view.findViewById(R.id.registerButton)
+        // Pre-fill email from arguments
+        binding.editEmailAddress.setText(args.user.email)
 
-        registerButton.setOnClickListener {
-            val user = User(
-                editUsername.text.toString(),
-                editEmail.text.toString(),
-                editPassword.text.toString()
+        binding.registerButton.setOnClickListener {
+            val newUser = User(
+                username = binding.editUsername.text.toString(),
+                email = binding.editEmailAddress.text.toString(),
+                password = binding.editPassword.text.toString()
             )
 
-            setFragmentResult("signUpResult", bundleOf("USER" to user))
-            parentFragmentManager.popBackStack()
+            // Set result using SavedStateHandle
+            findNavController().previousBackStackEntry?.savedStateHandle?.set("signUpResult", newUser)
+            findNavController().popBackStack()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

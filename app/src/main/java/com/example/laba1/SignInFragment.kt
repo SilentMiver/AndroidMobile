@@ -1,76 +1,66 @@
 package com.example.laba1
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.example.laba1.databinding.FragmentSignInBinding
 
 class SignInFragment : Fragment() {
-    private lateinit var authButton: Button
-    private lateinit var signUpButton: Button
-    private lateinit var editEmail: EditText
-    private lateinit var editPassword: EditText
-    private lateinit var textError: TextView
-    private lateinit var textUsername: TextView
-    private val TAG = "SignInFragment"
+    private var _binding: FragmentSignInBinding? = null
+    private val binding get() = _binding!!
+    private val args: SignInFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        Log.d(TAG, "onCreateView called")
-        return inflater.inflate(R.layout.fragment_sign_in, container, false)
+    ): View {
+        _binding = FragmentSignInBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authButton = view.findViewById(R.id.authButton)
-        signUpButton = view.findViewById(R.id.signUpButton)
-        editEmail = view.findViewById(R.id.editEmailAddress)
-        editPassword = view.findViewById(R.id.editPassword)
-        textError = view.findViewById(R.id.textError)
-        textUsername = view.findViewById(R.id.textUsername)
+        // Populate fields if user data exists
+        args.user?.let { user ->
+            binding.editEmailAddress.setText(user.email)
+            binding.textUsername.text = "Welcome, ${user.username}"
+        }
 
-        setUpListeners()
-        setUpFragmentResultListener()
-    }
-
-    private fun setUpListeners() {
-        authButton.setOnClickListener {
+        binding.authButton.setOnClickListener {
             if (validateInput()) {
-                (activity as? MainActivity)?.navigateToHome()
+                findNavController().navigate(SignInFragmentDirections.actionSignInToHome())
             } else {
-                textError.text = "Invalid email or password"
-                textError.visibility = View.VISIBLE
+                binding.textError.text = "Invalid email or password"
+                binding.textError.visibility = View.VISIBLE
             }
         }
 
-        signUpButton.setOnClickListener {
-            (activity as? MainActivity)?.navigateToSignUp(this)
+        binding.signUpButton.setOnClickListener {
+            val user = User(
+                email = binding.editEmailAddress.text.toString()
+            )
+            val action = SignInFragmentDirections.actionSignInToSignUp(user)
+            findNavController().navigate(action)
         }
-    }
 
-    private fun setUpFragmentResultListener() {
-        setFragmentResultListener("signUpResult") { _, bundle ->
-            val user = bundle.getParcelable<User>("USER")
-            user?.let {
-                textUsername.text = "Welcome, ${it.username}"
-                editEmail.setText(it.email)
-            }
+        // Observe for result from SignUpFragment
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<User>("signUpResult")?.observe(
+            viewLifecycleOwner
+        ) { user ->
+            binding.editEmailAddress.setText(user.email)
+            binding.textUsername.text = "Welcome, ${user.username}"
         }
     }
 
     private fun validateInput(): Boolean {
-        val email = editEmail.text.toString()
-        val password = editPassword.text.toString()
+        val email = binding.editEmailAddress.text.toString()
+        val password = binding.editPassword.text.toString()
         return isValidEmail(email) && isValidPassword(password)
     }
 
@@ -80,5 +70,10 @@ class SignInFragment : Fragment() {
 
     private fun isValidPassword(password: String): Boolean {
         return password.isNotEmpty()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
