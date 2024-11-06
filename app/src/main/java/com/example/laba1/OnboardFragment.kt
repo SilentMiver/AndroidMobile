@@ -10,7 +10,7 @@ import com.example.laba1.databinding.FragmentOnboardBinding
 
 class OnboardFragment : Fragment() {
     private var _binding: FragmentOnboardBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw RuntimeException()
 
     override fun onCreateView(
         inflater: LayoutInflater,

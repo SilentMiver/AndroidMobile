@@ -11,7 +11,7 @@ import com.example.laba1.databinding.FragmentSignUpBinding
 
 class SignUpFragment : Fragment() {
     private var _binding: FragmentSignUpBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw RuntimeException()
     private val args: SignUpFragmentArgs by navArgs()
 
     override fun onCreateView(
